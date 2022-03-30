@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+
+# We don want to use the mounted .ssh folder directly, to avoid unwanted modifications on host machine files,
+# so we mount the host .ssh folder to a temporary folder in the container, copy the files to .ssh folder in the container,
+# and then make as many changes as we need.
+
+cp -r /root/temp_ssh /root/.ssh
+chmod 700 /root/.ssh/config
+
+if [ -f /root/.ssh/config.linux ]; then
+  cp /root/.ssh/config.linux /root/.ssh/config
+fi
+
+if [ -f /root/.ssh/config.titan ]; then
+  cp /root/.ssh/config.titan /root/.ssh/config
+fi
+
+go build -o build/dbconntest_linux
