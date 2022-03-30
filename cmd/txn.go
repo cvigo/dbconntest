@@ -14,7 +14,9 @@ import (
 var txnCmd = &cobra.Command{
 	Use:   "txn",
 	Short: "Connect to the database, start and commit a DB transaction",
-	Long:  `Connect to the database, start and commit a DB transaction`,
+	Long: `
+With this command, each goroutine creates a DB transaction, and commits the transaction without running any query.
+As all the goroutines are launched at the same time, each one will make a new connection to the database.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		DoWork(controller.Txn)
 	},
@@ -22,6 +24,8 @@ var txnCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(txnCmd)
+
+	setCommonFlags(txnCmd)
 
 	// Here you will define your flags and configuration settings.
 

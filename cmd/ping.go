@@ -13,8 +13,10 @@ import (
 // connectCmd represents the connect command
 var connectCmd = &cobra.Command{
 	Use:   "ping",
-	Short: "Just connect and Ping the database",
-	Long:  `Just connect and Ping the database`,
+	Short: "Just connect and ping the database",
+	Long: `
+With this command, each goroutine will make a connection to the database, which requires the creation of
+a new physical connection (typically a TCP Socket, optionally encrypted) to the database.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		DoWork(controller.Ping)
 	},
@@ -22,6 +24,8 @@ var connectCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(connectCmd)
+
+	setCommonFlags(connectCmd)
 
 	// Here you will define your flags and configuration settings.
 

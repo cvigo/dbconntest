@@ -14,7 +14,9 @@ import (
 var queryTxnCmd = &cobra.Command{
 	Use:   "query_txn",
 	Short: "Runs a query inside a transaction",
-	Long:  `Runs a query inside a transaction`,
+	Long: `
+With this command, each goroutine creates a DB transaction, runs the indicated query, and commits the transaction.
+As all the goroutines are launched at the same time, each one will make a new connection to the database.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		DoWork(controller.TxnQuery)
 	},
@@ -22,6 +24,8 @@ var queryTxnCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(queryTxnCmd)
+
+	setCommonFlags(queryTxnCmd)
 
 	// Here you will define your flags and configuration settings.
 
