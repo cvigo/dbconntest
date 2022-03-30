@@ -17,8 +17,8 @@ docker-build:
 	  -w /usr/src/tempfolder \
 	  titan_builder "build/build"
 
-install_completion:
-	rm -f shell_completion/_dbconntest
-	rm -f shell_completion/dbconntest
-	./dbconntest completion zsh --URL=dummy --driver=dummy > shell_completion/_dbconntest
-	./dbconntest completion bash --URL=dummy --driver=dummy > shell_completion/dbconntest
+install_completion: build
+	rm -f shell_completion/_dbconntest_temp
+	rm -f shell_completion/dbconntest_temp
+	go run ./main.go completion bash > shell_completion/dbconntest_temp & mv -f shell_completion/dbconntest_temp shell_completion/dbconntest
+	go run ./main.go completion zsh > shell_completion/_dbconntest_temp & mv -f shell_completion/_dbconntest_temp shell_completion/_dbconntest

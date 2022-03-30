@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	cc "github.com/ivanpirog/coloredcobra"
 	"github.com/spf13/cobra"
 )
 
@@ -24,10 +25,13 @@ var LogLevel string
 var rootCmd = &cobra.Command{
 	Use:   "dbconntest",
 	Short: "Golang DB Connection Tester",
-	Long:  `Golang DB Connection Tester`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Long: `
+This simple tool spreads the number of goroutines indicated by "--connections" and runs simple SQL commands
+simultaneously.
+
+Please see the list of available commands below.
+
+Use "completion" command to generate the completion script for your shell (installation is left to you...).`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -40,26 +44,14 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&URL, "URL", "u", "", "ODBC connection string")
-	rootCmd.PersistentFlags().StringVarP(&Driver, "driver", "d", "", "DB driver (go_ibm_db, godror")
-	rootCmd.PersistentFlags().IntVarP(&Conns, "connections", "c", 1, "number of connections (default 1)")
-	rootCmd.PersistentFlags().DurationVarP(&Timeout, "timeout", "t", 10*time.Second, "timeout (default 10s)")
-	rootCmd.PersistentFlags().BoolVarP(&ThreadLock, "threadlock", "l", false, "each connection locks an OS thread (default false)")
-	rootCmd.PersistentFlags().StringVarP(&LogFormat, "logformat", "", "console", "log format (console or json). Default console")
-	rootCmd.PersistentFlags().StringVarP(&LogLevel, "loglevel", "", "info", "log level (debug, info, warning,, error, fatal, panic. Default info)")
-
-	rootCmd.RegisterFlagCompletionFunc("driver", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"go_ibm_db\tDB2 Driver-", "json\tJson format"}, cobra.ShellCompDirectiveDefault
+	cc.Init(&cc.Config{
+		RootCmd:  rootCmd,
+		Headings: cc.HiBlue + cc.Bold + cc.Underline,
+		Commands: cc.HiYellow + cc.Bold,
+		Example:  cc.Italic,
+		ExecName: cc.Bold,
+		Flags:    cc.Bold,
 	})
 
-	rootCmd.RegisterFlagCompletionFunc("logformat", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"console\tHuman readable format", "json\tJson format"}, cobra.ShellCompDirectiveDefault
-	})
-
-	rootCmd.RegisterFlagCompletionFunc("loglevel", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		return []string{"debug", "info", "warning", "error", "fatal", "panic"}, cobra.ShellCompDirectiveDefault
-	})
-
-	_ = rootCmd.MarkPersistentFlagRequired("URL")
-	_ = rootCmd.MarkPersistentFlagRequired("driver")
+	rootCmd.SetHelpCommand()
 }

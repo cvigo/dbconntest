@@ -13,6 +13,7 @@ import (
 
 	"dbconntest/log"
 
+	"github.com/godror/godror"
 	_ "github.com/godror/godror"
 	"github.com/ibmdb/go_ibm_db"
 	statsLib "github.com/montanaflynn/stats"
@@ -73,6 +74,7 @@ func DoWork(params *JobParams) {
 
 	if log.IsLevelEnabled(params.LogLevel) {
 		go_ibm_db.SetLogFunc(log.DriverLog)
+		godror.SetLog(log.DriverLog)
 	}
 
 	var timings []*runStats
@@ -261,11 +263,12 @@ func doWork(ctx context.Context, params *JobParams) *runStats {
 
 func GetStats(runstats []*runStats) *Stats {
 	var stats Stats
-	pingTime := make([]time.Duration, len(runstats))
-	beginTxTime := make([]time.Duration, len(runstats))
-	queryTime := make([]time.Duration, len(runstats))
-	commitTime := make([]time.Duration, len(runstats))
-	totalTime := make([]time.Duration, len(runstats))
+
+	var pingTime []time.Duration
+	var beginTxTime []time.Duration
+	var queryTime []time.Duration
+	var commitTime []time.Duration
+	var totalTime []time.Duration
 
 	stats.TotalRuns = len(runstats)
 	for _, s := range runstats {

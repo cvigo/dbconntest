@@ -14,7 +14,10 @@ import (
 var queryAloneCmd = &cobra.Command{
 	Use:   "query_alone",
 	Short: "Runs a query without opening a transaction",
-	Long:  `Runs a query without opening a transaction`,
+	Long: `
+With this command, each goroutine runs the indicated SQL query to the database, without opening a transaction
+beforehand.
+As all the goroutines are launched at the same time, each one will make a new connection to the database.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		DoWork(controller.SimpleQuery)
 	},
@@ -22,6 +25,8 @@ var queryAloneCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(queryAloneCmd)
+
+	setCommonFlags(queryAloneCmd)
 
 	// Here you will define your flags and configuration settings.
 
