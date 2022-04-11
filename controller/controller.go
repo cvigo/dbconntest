@@ -55,6 +55,7 @@ type JobParams struct {
 }
 
 type runStats struct {
+	id          string
 	pingTime    time.Duration
 	beginTxTime time.Duration
 	queryTime   time.Duration
@@ -65,6 +66,8 @@ type runStats struct {
 
 func DoWork(params *JobParams) {
 	var err error
+	var MaxGoRoutines int
+	var MaxThreads int
 
 	err = log.LogInit(params.LogLevel, params.LogFormat)
 	if err != nil {
@@ -93,13 +96,16 @@ func DoWork(params *JobParams) {
 		return
 	}
 
+	db.SetMaxIdleConns(0)
+	db.SetMaxOpenConns(params.Connections * 2)
+
 	// start the display goroutine
 	go func() {
 		for timing := range completeCh {
 			timings = append(timings, timing)
 			runs++
 			if timing.err != nil {
-				log.Logger.Errorf("%04d Worker Error: %s", runs, timing.err)
+				log.Logger.Errorf("%s Worker Error: %s", timing.id, timing.err)
 			} else {
 				log.Logger.With(
 					"Ping", timing.pingTime,
@@ -107,11 +113,17 @@ func DoWork(params *JobParams) {
 					"Query", timing.queryTime,
 					"Commit", timing.commitTime,
 					"Total", timing.totalTime,
-				).Infof("%04d Workers completed.", runs)
+				).Infof("%s Worker completed in %04d position.", timing.id, runs)
 			}
-			log.Logger.Debugf("threads in starting: %d", threadProfile.Count())
-			log.Logger.Debugf("goroutines in starting: %d", goroutineProfile.Count())
 
+			if gr := runtime.NumGoroutine(); gr > MaxGoRoutines {
+				MaxGoRoutines = gr
+			}
+			if thr := threadProfile.Count(); thr > MaxThreads {
+				MaxThreads = thr
+			}
+			//threadProfile.WriteTo(os.Stderr, 1)
+			//goroutineProfile.WriteTo(os.Stderr, 1)
 		}
 		doneCh <- struct{}{}
 	}()
@@ -139,16 +151,16 @@ func DoWork(params *JobParams) {
 	waitGroup := &sync.WaitGroup{}
 	for i := 0; i < params.Connections; i++ {
 		waitGroup.Add(1)
-		go func() {
+		go func(i int) {
 			if params.ThreadLock {
 				runtime.LockOSThread()
 			}
 			// Do the work and send the results to the display goroutine
 			log.Logger.Debugf("threads in starting: %d", threadProfile.Count())
 			log.Logger.Debugf("goroutines in starting: %d", goroutineProfile.Count())
-			completeCh <- doWork(ctx, params)
+			completeCh <- doWork(ctx, fmt.Sprintf("Worker-%04d", i), params)
 			waitGroup.Done()
-		}()
+		}(i)
 	}
 	waitGroup.Wait()
 	close(completeCh)
@@ -195,13 +207,24 @@ func DoWork(params *JobParams) {
 		"Pct95", stats.Total.Pct95,
 		"Pct99", stats.Total.Pct99,
 	)
+
+	log.Logger.Infof("Max. threads count: %d", MaxThreads)
+	log.Logger.Infof("Max. goroutines count: %d", MaxGoRoutines)
 }
 
-func doWork(ctx context.Context, params *JobParams) *runStats {
-	stats := &runStats{}
+func doWork(ctx context.Context, id string, params *JobParams) *runStats {
+	stats := &runStats{id: id}
 
 	start := time.Now()
 	defer func() { stats.totalTime = stats.pingTime + stats.beginTxTime + stats.queryTime + stats.commitTime }()
+
+	ctx = godror.ContextWithTraceTag(ctx, godror.TraceTag{
+		ClientIdentifier: id,
+		ClientInfo:       "",
+		DbOp:             "",
+		Module:           "",
+		Action:           "read",
+	})
 
 	switch params.JobType {
 	case Ping:
@@ -227,9 +250,10 @@ func doWork(ctx context.Context, params *JobParams) *runStats {
 		return stats
 
 	case SimpleQuery:
-		_, err := db.QueryContext(ctx, params.Query)
+		rows, err := db.QueryContext(ctx, params.Query)
 		stats.queryTime = time.Since(start)
 		stats.err = err
+		_ = rows.Close()
 		return stats
 
 	case TxnQuery:
@@ -243,7 +267,7 @@ func doWork(ctx context.Context, params *JobParams) *runStats {
 			return stats
 		}
 		start2 := time.Now()
-		_, err = tx.QueryContext(ctx, params.Query)
+		rows, err := tx.QueryContext(ctx, params.Query)
 		stats.queryTime = time.Since(start2)
 		if err != nil {
 			stats.err = err
@@ -253,6 +277,7 @@ func doWork(ctx context.Context, params *JobParams) *runStats {
 		err = tx.Commit()
 		stats.commitTime = time.Since(start3)
 		stats.err = err
+		_ = rows.Close()
 		return stats
 
 	default:

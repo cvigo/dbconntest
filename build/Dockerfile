@@ -15,7 +15,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Golang
-RUN wget -c https://dl.google.com/go/go1.15.linux-amd64.tar.gz -O - | tar -xz -C /opt \
+RUN wget -c https://dl.google.com/go/go1.17.linux-amd64.tar.gz -O - | tar -xz -C /opt \
     && mv /opt/go /usr/local
 
 ## Golang environment variables
