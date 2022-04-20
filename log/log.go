@@ -36,11 +36,20 @@ func LogInit(level string, format string) error {
 }
 
 func DriverLog(fields ...interface{}) error {
-	LogText := "Database driver debug log. "
+	LogText := "Driver Log"
 	if len(fields)%2 != 0 {
 		panic("driverLog expects even number of arguments")
 	}
 	Logger.Debugw(LogText, fields...)
+	return nil
+}
+
+func DriverTrace(fields ...interface{}) error {
+	LogText := "Driver Trace"
+	if len(fields)%2 != 0 {
+		panic("driverTrace expects even number of arguments")
+	}
+	Logger.Infow(LogText, fields...)
 	return nil
 }
 

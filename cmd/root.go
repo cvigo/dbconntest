@@ -20,6 +20,8 @@ var SQL string
 var ThreadLock bool
 var LogFormat string
 var LogLevel string
+var DriverTraces bool
+var DriverLogs bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
