@@ -27,4 +27,8 @@ require (
 	google.golang.org/protobuf v1.27.1 // indirect
 )
 
-replace github.com/ibmdb/go_ibm_db v0.3.5 => scm.live.es.nextgen.igrupobbva/connectors/go_ibm_db v0.3.5
+//replace github.com/ibmdb/go_ibm_db v0.3.5 => scm.live.es.nextgen.igrupobbva/connectors/go_ibm_db v0.3.5
+replace github.com/ibmdb/go_ibm_db => ../go_ibm_db
+
+replace github.com/godror/godror => ../godror
+

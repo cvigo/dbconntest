@@ -14,7 +14,6 @@ import (
 	"dbconntest/log"
 
 	"github.com/godror/godror"
-	_ "github.com/godror/godror"
 	"github.com/ibmdb/go_ibm_db"
 	statsLib "github.com/montanaflynn/stats"
 )
@@ -27,6 +26,8 @@ const TxnQuery = "query_txn"
 var db *sql.DB
 
 type Stats struct {
+	Start       time.Time
+	End         time.Time
 	TotalRuns   int
 	TotalErrors int
 	Ping        ResponseTimes
@@ -43,19 +44,23 @@ type ResponseTimes struct {
 }
 
 type JobParams struct {
-	JobType     string
-	DbType      string
-	URL         string
-	Query       string
-	Connections int
-	Timeout     time.Duration
-	ThreadLock  bool
-	LogFormat   string
-	LogLevel    string
+	JobType      string
+	DbType       string
+	URL          string
+	Query        string
+	Connections  int
+	Timeout      time.Duration
+	ThreadLock   bool
+	LogFormat    string
+	LogLevel     string
+	DriverTraces bool
+	DriverLogs   bool
 }
 
 type runStats struct {
 	id          string
+	start       time.Time
+	end         time.Time
 	pingTime    time.Duration
 	beginTxTime time.Duration
 	queryTime   time.Duration
@@ -75,9 +80,16 @@ func DoWork(params *JobParams) {
 		os.Exit(1)
 	}
 
-	if log.IsLevelEnabled(params.LogLevel) {
+	if params.DriverLogs {
 		go_ibm_db.SetLogFunc(log.DriverLog)
 		godror.SetLog(log.DriverLog)
+	}
+
+	if params.DriverTraces {
+		go_ibm_db.SetTraceFunc(log.DriverTrace)
+		go_ibm_db.SetTraceText("start_time", "end_time", "duration")
+		godror.SetTrace(log.DriverTrace)
+		godror.SetTraceText("start_time", "end_time", "duration")
 	}
 
 	var timings []*runStats
@@ -112,8 +124,10 @@ func DoWork(params *JobParams) {
 					"BeginTx", timing.beginTxTime,
 					"Query", timing.queryTime,
 					"Commit", timing.commitTime,
-					"Total", timing.totalTime,
-				).Infof("%s Worker completed in %04d position.", timing.id, runs)
+					"start_time", timing.start,
+					"end_time", timing.end,
+					"duration", timing.totalTime,
+				).Infof("%s completed in %04d position.", timing.id, runs)
 			}
 
 			if gr := runtime.NumGoroutine(); gr > MaxGoRoutines {
@@ -213,10 +227,13 @@ func DoWork(params *JobParams) {
 }
 
 func doWork(ctx context.Context, id string, params *JobParams) *runStats {
-	stats := &runStats{id: id}
-
 	start := time.Now()
-	defer func() { stats.totalTime = stats.pingTime + stats.beginTxTime + stats.queryTime + stats.commitTime }()
+	stats := &runStats{id: id, start: start}
+
+	defer func() {
+		stats.totalTime = stats.pingTime + stats.beginTxTime + stats.queryTime + stats.commitTime
+		stats.end = time.Now()
+	}()
 
 	ctx = godror.ContextWithTraceTag(ctx, godror.TraceTag{
 		ClientIdentifier: id,
