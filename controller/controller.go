@@ -108,7 +108,7 @@ func DoWork(params *JobParams) {
 		return
 	}
 
-	db.SetMaxIdleConns(0)
+	db.SetMaxIdleConns(0) // Not interested in connection reuse for this type of test. Happy to drop after the operation ends
 	db.SetMaxOpenConns(params.Connections * 2)
 
 	// start the display goroutine
