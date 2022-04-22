@@ -26,7 +26,3 @@ require (
 	golang.org/x/sys v0.0.0-20220330033206-e17cdc41300f // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 )
-
-replace github.com/godror/godror => github.com/cvigo/godror v0.33.1-0.20220421115748-171301d5ea0a
-
-replace github.com/ibmdb/go_ibm_db => scm.live.es.nextgen.igrupobbva/connectors/go_ibm_db v0.3.6

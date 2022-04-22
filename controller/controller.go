@@ -14,7 +14,6 @@ import (
 	"dbconntest/log"
 
 	"github.com/godror/godror"
-	"github.com/ibmdb/go_ibm_db"
 	statsLib "github.com/montanaflynn/stats"
 )
 
@@ -81,15 +80,16 @@ func DoWork(params *JobParams) {
 	}
 
 	if params.DriverLogs {
-		go_ibm_db.SetLogFunc(log.DriverLog)
+		if params.DbType == "go_ibm_db" {
+			fmt.Println("Driver logs are not supported for go_ibm_db. Do not use [--driverlogs=true]")
+			os.Exit(1)
+		}
 		godror.SetLog(log.DriverLog)
 	}
 
 	if params.DriverTraces {
-		go_ibm_db.SetTraceFunc(log.DriverTrace)
-		go_ibm_db.SetTraceText("start_time", "end_time", "duration")
-		godror.SetTrace(log.DriverTrace)
-		godror.SetTraceText("start_time", "end_time", "duration")
+		fmt.Println("This version does not use the library forks that implements driver traces. Do not use [--drivertraces=true]")
+		os.Exit(1)
 	}
 
 	var timings []*runStats
