@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/godror/godror v0.33.0
+	github.com/google/uuid v1.3.0
 	github.com/ibmdb/go_ibm_db v0.3.0
 	github.com/montanaflynn/stats v0.6.6
 	github.com/spf13/cobra v1.4.0
@@ -29,4 +30,4 @@ require (
 
 replace github.com/godror/godror => github.com/cvigo/godror v0.33.1-0.20220421115748-171301d5ea0a
 
-replace github.com/ibmdb/go_ibm_db => scm.live.es.nextgen.igrupobbva/connectors/go_ibm_db v0.3.6
+replace github.com/ibmdb/go_ibm_db => scm.live.es.nextgen.igrupobbva/connectors/go_ibm_db v0.3.1-0.20220504150347-9e2caf6b4115
