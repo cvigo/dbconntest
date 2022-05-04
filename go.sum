@@ -18,6 +18,8 @@ github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaS
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.6 h1:BKbKCqvP6I+rmFHt06ZmyQtvB8xAkWdhFyr0ZUNZcxQ=
 github.com/google/go-cmp v0.5.6/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
+github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
+github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/inconshreveable/mousetrap v1.0.0 h1:Z8tu5sraLXCXIcARxBp/8cbvlwVa7Z1NHg9XEKhtSvM=
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
 github.com/ivanpirog/coloredcobra v1.0.0 h1:MY8hiTd5pfXE6K2OPDAUZvx7M8N2rXmd0hyW1rHBz4Q=
@@ -104,5 +106,5 @@ gopkg.in/yaml.v2 v2.4.0/go.mod h1:RDklbk79AGWmwhnvt/jBztapEOGDOx6ZbXqjP6csGnQ=
 gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b h1:h8qDotaEPuJATrMmW04NCwg7v22aHH28wwpauUhK9Oo=
 gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
-scm.live.es.nextgen.igrupobbva/connectors/go_ibm_db v0.3.6 h1:8KGtoQMCE6d25TJuJglGING6AIde4WCqTHB9HVFBJeU=
-scm.live.es.nextgen.igrupobbva/connectors/go_ibm_db v0.3.6/go.mod h1:7+V0GH8zekSg4kVXlBYX0YA9TBhhvGXPQVQiqfXJTFw=
+scm.live.es.nextgen.igrupobbva/connectors/go_ibm_db v0.3.1-0.20220504150347-9e2caf6b4115 h1:b7KMcUJUDuTNu5HAkLTavuJC4l+74dfmnZY56RV3acI=
+scm.live.es.nextgen.igrupobbva/connectors/go_ibm_db v0.3.1-0.20220504150347-9e2caf6b4115/go.mod h1:7+V0GH8zekSg4kVXlBYX0YA9TBhhvGXPQVQiqfXJTFw=

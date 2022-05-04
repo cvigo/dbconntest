@@ -14,6 +14,7 @@ import (
 	"dbconntest/log"
 
 	"github.com/godror/godror"
+	"github.com/google/uuid"
 	"github.com/ibmdb/go_ibm_db"
 	statsLib "github.com/montanaflynn/stats"
 )
@@ -237,10 +238,19 @@ func doWork(ctx context.Context, id string, params *JobParams) *runStats {
 
 	ctx = godror.ContextWithTraceTag(ctx, godror.TraceTag{
 		ClientIdentifier: id,
-		ClientInfo:       "",
-		DbOp:             "",
-		Module:           "",
+		ClientInfo:       "dbconntest",
+		DbOp:             params.JobType,
+		Module:           "doWork",
 		Action:           "read",
+	})
+
+	hostname, _ := os.Hostname()
+	ctx = go_ibm_db.ContextWithTraceTag(ctx, go_ibm_db.TraceTag{
+		ClientApplicationName:  "dbconntest",
+		ClientCorrelationToken: uuid.NewString(),
+		ClientUserID:           id,
+		ClientWorkstationName:  hostname,
+		ProgramID:              "doWork",
 	})
 
 	switch params.JobType {
